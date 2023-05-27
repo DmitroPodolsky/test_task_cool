@@ -47,9 +47,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-'''FROM python:3
-ENV PYTHONUNBUFFERED 1
-WORKDIR /app
-COPY . .
-RUN poetry install
-$(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi'''
