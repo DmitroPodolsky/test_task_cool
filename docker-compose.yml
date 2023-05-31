@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    build: .
+    command: python main.py
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    entrypoint: redis-server --appendonly yes

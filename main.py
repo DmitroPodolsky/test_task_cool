@@ -5,9 +5,10 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
 from config import Token
-
-args = []
-
+import redis
+import json
+#args = []
+redis_db = redis.StrictRedis(host='redis', port=6379, db=0,decode_responses=True)
 def calculate_coins(args: list) -> str:
     tails = args.count(1)
     eagle = args.count(2)
@@ -21,19 +22,25 @@ def calculate_coins(args: list) -> str:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
+    await update.message.reply_text(f'hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
+    redis_db.mset({update.message.from_user.id:json.dumps([])})
     logger.success('start message completed')
 
 async def flip_coin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global args
-    args.append(random.randint(1, 2))
+    #global args
+    data_info_conv = redis_db.get(update.message.from_user.id)
+    data_info = json.loads(data_info_conv)
+    data_info.append(random.randint(1, 2))
     await update.message.reply_text('flip a coin...')
     time.sleep(1)
-    await update.message.reply_text(f'came up {"tail" if args[-1] == 1 else "eagle"}')
+    await update.message.reply_text(f'came up {"tail" if data_info[-1] == 1 else "eagle"}')
+    redis_db.mset({update.message.from_user.id: json.dumps(data_info)})
     logger.success('flip completed')
 
 async def static_coins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    answer = calculate_coins(args)
+    data_info_conv = redis_db.get(update.message.from_user.id)
+    data_info = json.loads(data_info_conv)
+    answer = calculate_coins(data_info)
     await update.message.reply_text(answer)
     logger.success('static completed')
 
@@ -47,9 +54,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-'''FROM python:3
-ENV PYTHONUNBUFFERED 1
-WORKDIR /app
-COPY . .
-RUN poetry install
-$(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi'''
