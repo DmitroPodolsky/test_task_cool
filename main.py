@@ -1,14 +1,16 @@
-
 from loguru import logger
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
-from config import Token
-import redis
+from config import TOKEN, REDIS_DB, Settings
 import json
-#args = []
-redis_db = redis.StrictRedis(host='redis', port=6379, db=0,decode_responses=True)
+
+
+def get_info_args(args: json) -> list:
+    return json.loads(args)
+
+
 def calculate_coins(args: list) -> str:
     tails = args.count(1)
     eagle = args.count(2)
@@ -22,35 +24,37 @@ def calculate_coins(args: list) -> str:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
-    redis_db.mset({update.message.from_user.id:json.dumps([])})
+    await update.message.reply_text(
+        f'hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
+    REDIS_DB.mset({update.message.from_user.id: json.dumps([])})
     logger.success('start message completed')
 
+
 async def flip_coin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    #global args
-    data_info_conv = redis_db.get(update.message.from_user.id)
-    data_info = json.loads(data_info_conv)
+    data_info = get_info_args(REDIS_DB.get(update.message.from_user.id))
     data_info.append(random.randint(1, 2))
     await update.message.reply_text('flip a coin...')
     time.sleep(1)
     await update.message.reply_text(f'came up {"tail" if data_info[-1] == 1 else "eagle"}')
-    redis_db.mset({update.message.from_user.id: json.dumps(data_info)})
+    REDIS_DB.mset({update.message.from_user.id: json.dumps(data_info)})
     logger.success('flip completed')
 
+
 async def static_coins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    data_info_conv = redis_db.get(update.message.from_user.id)
-    data_info = json.loads(data_info_conv)
+    data_info = get_info_args(REDIS_DB.get(update.message.from_user.id))
     answer = calculate_coins(data_info)
     await update.message.reply_text(answer)
     logger.success('static completed')
 
+
 def main() -> None:
-    application = Application.builder().token(Token).build()
+    application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("flip", flip_coin))
     application.add_handler(CommandHandler("static", static_coins))
     logger.success('script started')
     application.run_polling()
+
 
 if __name__ == "__main__":
     main()
