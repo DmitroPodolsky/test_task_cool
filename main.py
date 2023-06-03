@@ -4,12 +4,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
 from config import TOKEN
-import json
-from db import set_info_db,get_info_db
-
-
-def get_info_args(args: json) -> list:
-    return json.loads(args)
+from db import set_info_db, get_info_db
 
 
 def calculate_coins(args: list) -> str:
@@ -27,7 +22,7 @@ def calculate_coins(args: list) -> str:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         f'hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
-    set_info_db(update,[])
+    set_info_db(update, [])
     logger.success('start message completed')
 
 
@@ -37,7 +32,7 @@ async def flip_coin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('flip a coin...')
     time.sleep(1)
     await update.message.reply_text(f'came up {"tail" if data_info[-1] == 1 else "eagle"}')
-    set_info_db(update,data_info)
+    set_info_db(update, data_info)
     logger.success('flip completed')
 
 
