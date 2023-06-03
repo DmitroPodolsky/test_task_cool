@@ -4,7 +4,6 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
 from config import TOKEN
-import json
 from db import set_info_db,get_info_db
 
 
