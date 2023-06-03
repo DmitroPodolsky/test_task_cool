@@ -4,7 +4,6 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    BOT_TOKEN: str = dotenv.dotenv_values(".env")['Token']  # your token
     REDIS_HOST: str = 'redis'
     REDIS_PORT: int = 6379
 
