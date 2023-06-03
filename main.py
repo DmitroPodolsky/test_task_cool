@@ -8,10 +8,6 @@ import json
 from db import set_info_db,get_info_db
 
 
-def get_info_args(args: json) -> list:
-    return json.loads(args)
-
-
 def calculate_coins(args: list) -> str:
     tails = args.count(1)
     eagle = args.count(2)
