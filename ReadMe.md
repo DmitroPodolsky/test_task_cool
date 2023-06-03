@@ -6,7 +6,7 @@
 
 2. cd test_task_cool and create file .env
 
-3. in .env in variable Token put your token, example: Token=1743632279:gweuwgfc
+3. in .env in variable BOT_TOKEN put your token, example: BOT_TOKEN=1743632279:gweuwgfc
 
 ## there 2 ways to run this program, FIRST:
 

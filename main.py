@@ -5,6 +5,8 @@ import time
 import random
 from config import TOKEN
 from db import set_info_db, get_info_db
+import json
+from db import set_info_db,get_info_db
 
 
 def calculate_coins(args: list) -> str:
