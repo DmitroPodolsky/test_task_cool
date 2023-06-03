@@ -15,4 +15,3 @@ class Settings(BaseSettings):
 
 settings = Settings()
 REDIS_DB = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
-TOKEN = settings.BOT_TOKEN

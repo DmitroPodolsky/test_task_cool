@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
-from config import TOKEN
+from config import settings
 from db import set_info_db, get_info_db
 import json
 from db import set_info_db,get_info_db
@@ -46,7 +46,7 @@ async def static_coins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 def main() -> None:
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token(settings.BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("flip", flip_coin))
     application.add_handler(CommandHandler("static", static_coins))
