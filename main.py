@@ -3,8 +3,9 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 import time
 import random
-from config import TOKEN, REDIS_DB, Settings
+from config import TOKEN
 import json
+from db import set_info_db,get_info_db
 
 
 def get_info_args(args: json) -> list:
@@ -26,22 +27,22 @@ def calculate_coins(args: list) -> str:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         f'hello, flip a coin please - /flip\npercent chance of a side of the coin coming up - /static')
-    REDIS_DB.mset({update.message.from_user.id: json.dumps([])})
+    set_info_db(update,[])
     logger.success('start message completed')
 
 
 async def flip_coin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    data_info = get_info_args(REDIS_DB.get(update.message.from_user.id))
+    data_info = get_info_db(update)
     data_info.append(random.randint(1, 2))
     await update.message.reply_text('flip a coin...')
     time.sleep(1)
     await update.message.reply_text(f'came up {"tail" if data_info[-1] == 1 else "eagle"}')
-    REDIS_DB.mset({update.message.from_user.id: json.dumps(data_info)})
+    set_info_db(update,data_info)
     logger.success('flip completed')
 
 
 async def static_coins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    data_info = get_info_args(REDIS_DB.get(update.message.from_user.id))
+    data_info = get_info_db(update)
     answer = calculate_coins(data_info)
     await update.message.reply_text(answer)
     logger.success('static completed')
